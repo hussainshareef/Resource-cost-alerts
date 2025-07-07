@@ -1,0 +1,32 @@
+name: Azure Cost Report (PowerShell)
+
+on:
+  schedule:
+    - cron: '0 6 1,15 * *' # Runs 6:00 UTC on 1st and 15th
+  workflow_dispatch:
+
+jobs:
+  cost-report:
+    runs-on: windows-latest
+
+    env:
+      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      EMAIL_USER: ${{ secrets.EMAIL_USER }}
+      EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
+      EMAIL_TO: ${{ secrets.EMAIL_TO }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Azure CLI
+        run: |
+          Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile .\AzureCLI.msi
+          Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'
+
+      - name: Run PowerShell script
+        shell: pwsh
+        run: ./generate-cost-report.ps1
