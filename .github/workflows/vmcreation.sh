@@ -78,6 +78,7 @@ jobs:
             --subnet mysubnet \
             --network-security-group mynsg \
             --public-ip-address mypubip
+            
 
       - name: Create VM and attach NIC
         run: |
